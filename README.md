@@ -8,12 +8,12 @@ A Guicified JUnit test runner which allows tests to be written very simply:
   * Load default ``@Named`` values from ``$PACKAGE/$TEST_NAME.properties`` or can be specified in annotations
   * Write normal JUnit test methods, but with arguments:
 
-	  @RunWith(GuiceRunner.class)
-	  @TestWith({ModuleA.class, ModuleB.class})
-	  public void MyTest {
-		 @Test
-		 public void guiceTest ( InjectedThing thing ) { ... }
-	  }
+		  @RunWith(GuiceRunner.class)
+		  @TestWith({ModuleA.class, ModuleB.class})
+		  public void MyTest {
+			 @Test
+			 public void guiceTest ( InjectedThing thing ) { ... }
+		  }
 
 This makes it possible to write unit tests that use dependency injection, and eliminate complicated set-up code from tests.
 
