@@ -4,6 +4,7 @@
         <artifactId>mastfrog-parent</artifactId>
         <groupId>com.mastfrog</groupId>
         <version>1.5.0</version>
+        <relativePath/>
     </parent>
     <name>Giulius Tests</name>
     <modelVersion>4.0.0</modelVersion>
@@ -42,11 +43,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- 
-                        Necessary to avoid javac bug 
-                        http://bugs.sun.com/view_bug.do?bug_id=6512707 
-                        Turning off with JDK 7 - JDK 6 builds may have problems
-                        -->
+                    <!--
+                    Necessary to avoid javac bug
+                    http://bugs.sun.com/view_bug.do?bug_id=6512707
+                    Turning off with JDK 7 - JDK 6 builds may have problems
+                    -->
                     <!--<proc>none</proc>-->
                     <debug>true</debug>
                     <source>1.6</source>
@@ -67,7 +68,7 @@
                         <databaseSchema>MY_TEST_SCHEMA_${surefire.forkNumber}</databaseSchema>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -86,4 +87,19 @@
             <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>timboudreau-builds</id>
+            <name>timboudreau.com builds</name>
+            <url>http://timboudreau.com/builds/plugin/repository/everything/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
