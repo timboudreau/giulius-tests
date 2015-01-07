@@ -376,6 +376,7 @@ public class GuiceRunner extends AbstractRunner {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         protected void invokeTest(final Statement base, final Object target, final Dependencies dependencies) throws Throwable {
             final Type[] paramTypes = method.getMethod().getGenericParameterTypes();
             Test test = method.getAnnotation(Test.class);
@@ -405,7 +406,6 @@ public class GuiceRunner extends AbstractRunner {
                                     } else {
                                         key = Key.get(paramTypes[i]);
                                     }
-                                    System.out.println("Get instance of " + key + " for " + method.getMethod().getDeclaringClass() + "." + method.getName());
                                     parameters[i] = dependencies.getInstance(key);
                                 } catch (ConfigurationException e) {
                                     throw new IllegalStateException ("Guice configuration exception creating parameter of type " + paramTypes[i] + " for " + method.getName() + " on " + target.getClass().getName(), e);
