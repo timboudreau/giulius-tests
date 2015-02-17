@@ -29,8 +29,8 @@ import com.mastfrog.settings.SettingsBuilder;
 import com.mastfrog.settings.Settings;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
+import com.mastfrog.guicy.annotations.Namespace;
 import com.mastfrog.settings.MutableSettings;
-import com.mastfrog.util.Exceptions;
 import com.mastfrog.util.Streams;
 import com.mastfrog.util.Strings;
 import java.io.File;
@@ -40,10 +40,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.rules.MethodRule;
@@ -101,7 +100,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                     || method.getAnnotation(SkipWhenNetworkUnavailable.class) != null) {
                 result = !NETWORK_CHECK.isNetworkAvailable();
                 if (!result) {
-                    System.out.println("Skip " + testClass.getName() + "."
+                    System.err.println("Skip " + testClass.getName() + "."
                             + method.getName() + " due to network unavailability");
                 }
             }
@@ -266,8 +265,8 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
     protected final Settings loadSettings() throws Throwable {
         SettingsBuilder sb = SettingsBuilder.createDefault();
         String[] settingsLocations = settingsLocations();
-        System.out.println("Loading Settings from the following locations for " + getDescription() + " " + method.getName());
-        System.out.println(Strings.toString(settingsLocations));
+        System.err.println("Loading Settings from the following locations for " + getDescription() + " " + method.getName());
+        System.err.println(Strings.toString(settingsLocations));
         for (String loc : settingsLocations) {
             if (Streams.locate(loc) == null) {
                 throw GuiceRunner.fakeException("No such settings file: " + loc, testClass.getJavaClass(), 0);
@@ -278,7 +277,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         Settings settings = sb.build();
 
         if (Boolean.getBoolean("guice.tests.debug")) {
-            System.out.println("SETTINGS ARE " + settings);
+            System.err.println("SETTINGS ARE " + settings);
         }
         if (guiceRunner != null) {
             settings = guiceRunner.onSettingsCreated(settings);
@@ -296,16 +295,19 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                 if (sb.length() > 0) {
                     sb.append(',');
                 }
-                sb.append(m.getClass().getName());
+                Class<? extends Module> type = m.getClass();
+                sb.append(GuiceRunner.IterativeGuiceTestRunner.nameOf(type));
             }
-            System.out.println("Instantiated the following modules for :" + testClass.getName() + "." + method.getName());
-            System.out.println(sb);
+            System.err.println("Instantiated the following modules for :" + testClass.getName() + "." + method.getName());
+            System.err.println(sb);
         } else {
-            System.out.println("No modules requred for " + testClass.getName() + "." + method.getName());
+            System.err.println("No modules requred for " + testClass.getName() + "." + method.getName());
         }
         DependenciesBuilder builder = Dependencies.builder().useMutableSettings();
         builder.addDefaultSettings();
-        System.out.println("NAMESPACES: " + builder.namespaces());
+        if (!Collections.singleton(Namespace.DEFAULT).equals(builder.namespaces())) {
+            System.err.println("\nNAMESPACES: " + builder.namespaces());
+        }
         for (String ns : builder.namespaces()) {
             builder.add(settings, ns);
         }
@@ -326,7 +328,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
             if (prop.startsWith(prefix) && prop.length() > prefix.length()) {
                 String name = prop.substring(prefix.length());
                 String val = System.getProperty(prop);
-                System.out.println("Setting override: " + name + "=" + val);
+                System.err.println("Setting override: " + name + "=" + val);
                 hasOverrides = true;
                 mutable.setString(name, val);
             }
@@ -355,7 +357,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
     private Module instantiateModule(Class<? extends Module> moduleClass, Settings settings) throws Throwable {
         Module module;
         Constructor c = GuiceRunner.findUsableModuleConstructor(moduleClass);
-        System.out.println("Will construct module " + moduleClass.getName() + " using " + c);
+        System.err.println("Will construct module " + moduleClass.getName() + " using " + c);
         c.setAccessible(true);
         if (c.getParameterTypes().length == 1) {
             module = (Module) c.newInstance(settings);
@@ -394,7 +396,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
             return new Statement() {
                 @Override
                 public void evaluate() throws Throwable {
-                    System.out.println("Skipping " + method.getName() + " in IDE mode");
+                    System.err.println("Skipping " + method.getName() + " in IDE mode");
                 }
             };
         }

@@ -25,7 +25,6 @@ package com.mastfrog.giulius.tests;
 
 import com.mastfrog.settings.Settings;
 import com.google.inject.ConfigurationException;
-import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.mastfrog.giulius.Dependencies;
@@ -485,7 +484,7 @@ public class GuiceRunner extends AbstractRunner {
             }
         }
 
-        private static String nameOf(Class<? extends Module> moduleClass) {
+        public static String nameOf(Class<? extends Module> moduleClass) {
             ModuleName mn = moduleClass.getAnnotation(ModuleName.class);
             return mn == null ? moduleClass.getSimpleName() : mn.value();
         }

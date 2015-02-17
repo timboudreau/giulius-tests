@@ -25,7 +25,6 @@ package com.mastfrog.giulius.tests;
 
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
-import com.mastfrog.settings.MutableSettings;
 import com.mastfrog.settings.Settings;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,8 +48,10 @@ public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> impl
     private boolean runnersInitialized;
     private List<RunWrapper> runWrappers = new ArrayList<RunWrapper>();
 
+    @SuppressWarnings("LeakingThisInConstructor")
     protected AbstractRunner(Class<?> testClass, RunnerFactory... runnerFactories) throws InitializationError {
         super(testClass);
+        System.setProperty("unit.test", "true");
         if (runnerFactories == null || runnerFactories.length == 0) {
             throw new IllegalArgumentException("No runner factories");
         }

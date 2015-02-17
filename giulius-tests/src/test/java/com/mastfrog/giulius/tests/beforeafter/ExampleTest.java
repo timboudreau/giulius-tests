@@ -45,7 +45,6 @@ public class ExampleTest {
         log.info("--------------- Starting One Time Only Initialization ---------------");
         a = new Object();
         log.info("--------------- Ending One Time Only Initialization ---------------");
-        Thread.dumpStack();
     }
 
     @Before
