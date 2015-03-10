@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2013 Tim Boudreau.
@@ -91,6 +91,12 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         return actualRunner.getDescription();
     }
 
+    private static void log(CharSequence what) {
+        if (Boolean.getBoolean("giulius.tests.verbose")) {
+            System.err.println(what);
+        }
+    }
+
     protected boolean skip() {
         boolean inIDE = Dependencies.isIDEMode();
         boolean result = inIDE && (testClass.getJavaClass().getAnnotation(SkipWhenRunInIDE.class) != null
@@ -100,7 +106,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                     || method.getAnnotation(SkipWhenNetworkUnavailable.class) != null) {
                 result = !NETWORK_CHECK.isNetworkAvailable();
                 if (!result) {
-                    System.err.println("Skip " + testClass.getName() + "."
+                    log("Skip " + testClass.getName() + "."
                             + method.getName() + " due to network unavailability");
                 }
             }
@@ -265,8 +271,8 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
     protected final Settings loadSettings() throws Throwable {
         SettingsBuilder sb = SettingsBuilder.createDefault();
         String[] settingsLocations = settingsLocations();
-        System.err.println("Loading Settings from the following locations for " + getDescription() + " " + method.getName());
-        System.err.println(Strings.toString(settingsLocations));
+        log("Loading Settings from the following locations for " + getDescription() + " " + method.getName());
+        log(Strings.toString(settingsLocations));
         for (String loc : settingsLocations) {
             if (Streams.locate(loc) == null) {
                 throw GuiceRunner.fakeException("No such settings file: " + loc, testClass.getJavaClass(), 0);
@@ -277,7 +283,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         Settings settings = sb.build();
 
         if (Boolean.getBoolean("guice.tests.debug")) {
-            System.err.println("SETTINGS ARE " + settings);
+            log("SETTINGS ARE " + settings);
         }
         if (guiceRunner != null) {
             settings = guiceRunner.onSettingsCreated(settings);
@@ -298,15 +304,15 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                 Class<? extends Module> type = m.getClass();
                 sb.append(GuiceRunner.IterativeGuiceTestRunner.nameOf(type));
             }
-            System.err.println("Instantiated the following modules for :" + testClass.getName() + "." + method.getName());
-            System.err.println(sb);
+            log("Instantiated the following modules for :" + testClass.getName() + "." + method.getName());
+            log(sb);
         } else {
-            System.err.println("No modules requred for " + testClass.getName() + "." + method.getName());
+            log("No modules requred for " + testClass.getName() + "." + method.getName());
         }
         DependenciesBuilder builder = Dependencies.builder().useMutableSettings();
         builder.addDefaultSettings();
         if (!Collections.singleton(Namespace.DEFAULT).equals(builder.namespaces())) {
-            System.err.println("\nNAMESPACES: " + builder.namespaces());
+            log("\nNAMESPACES: " + builder.namespaces());
         }
         for (String ns : builder.namespaces()) {
             builder.add(settings, ns);
@@ -328,7 +334,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
             if (prop.startsWith(prefix) && prop.length() > prefix.length()) {
                 String name = prop.substring(prefix.length());
                 String val = System.getProperty(prop);
-                System.err.println("Setting override: " + name + "=" + val);
+                log("Setting override: " + name + "=" + val);
                 hasOverrides = true;
                 mutable.setString(name, val);
             }
@@ -357,7 +363,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
     private Module instantiateModule(Class<? extends Module> moduleClass, Settings settings) throws Throwable {
         Module module;
         Constructor c = GuiceRunner.findUsableModuleConstructor(moduleClass);
-        System.err.println("Will construct module " + moduleClass.getName() + " using " + c);
+        log("Will construct module " + moduleClass.getName() + " using " + c);
         c.setAccessible(true);
         if (c.getParameterTypes().length == 1) {
             module = (Module) c.newInstance(settings);
@@ -396,7 +402,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
             return new Statement() {
                 @Override
                 public void evaluate() throws Throwable {
-                    System.err.println("Skipping " + method.getName() + " in IDE mode");
+                    log("Skipping " + method.getName() + " in IDE mode");
                 }
             };
         }
