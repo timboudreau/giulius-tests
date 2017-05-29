@@ -1,7 +1,7 @@
 package com.mastfrog.giulius.tests.ns;
 
 import com.google.inject.ImplementedBy;
-import com.mastfrog.guicy.annotations.Namespace;
+import com.mastfrog.giulius.annotations.Namespace;
 
 @ImplementedBy(WildcardOptionsImpl.class)
 @Namespace("wildcard")

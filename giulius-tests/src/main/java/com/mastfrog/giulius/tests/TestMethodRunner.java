@@ -29,7 +29,7 @@ import com.mastfrog.settings.SettingsBuilder;
 import com.mastfrog.settings.Settings;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
-import com.mastfrog.guicy.annotations.Namespace;
+import com.mastfrog.giulius.annotations.Namespace;
 import com.mastfrog.settings.MutableSettings;
 import com.mastfrog.util.Streams;
 import com.mastfrog.util.Strings;

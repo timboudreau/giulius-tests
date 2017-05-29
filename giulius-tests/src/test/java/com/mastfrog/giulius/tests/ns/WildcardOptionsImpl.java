@@ -1,13 +1,13 @@
 package com.mastfrog.giulius.tests.ns;
 
 import com.google.inject.Inject;
-import com.mastfrog.guicy.annotations.Defaults;
+import com.mastfrog.giulius.annotations.Defaults;
 import com.mastfrog.settings.Settings;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import static com.mastfrog.giulius.tests.ns.WildcardOptions.*;
-import com.mastfrog.guicy.annotations.Namespace;
+import com.mastfrog.giulius.annotations.Namespace;
 
 @Defaults(value = {DISABLED + '=' + DISABLED_DEFAULT, WILDCARD_MIN_PREFIX + '='
     + WILDCARD_MIN_PREFIX_DEFAULT,
