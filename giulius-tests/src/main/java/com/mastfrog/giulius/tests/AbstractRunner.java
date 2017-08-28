@@ -43,6 +43,7 @@ import org.junit.runners.model.TestClass;
  * @author Tim Boudreau
  */
 public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> implements RuleWrapperProvider {
+
     private final List<TestMethodRunner> runners;
     private final RunnerFactory runnerFactory;
     private boolean runnersInitialized;
@@ -67,7 +68,7 @@ public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> impl
     protected void onAfterCreateDependencies(TestClass testClass, FrameworkMethod method, Settings settings, Dependencies dependencies) {
         //Subclasses can create test fixtures or whatever they need to here
     }
-    
+
     protected Settings onSettingsCreated(Settings settings) {
         return settings;
     }
@@ -94,11 +95,11 @@ public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> impl
             }
         }
     }
-    
+
     protected static TestMethodRunner createJUnitTestMethodRunner(TestClass clazz, FrameworkMethod method, RuleWrapperProvider p, AbstractRunner runner) throws InitializationError {
         return new StandardTestRunner(clazz, method, p, runner);
     }
-    
+
     private static class StandardTestRunner extends TestMethodRunner {
 
         StandardTestRunner(TestClass testClass, FrameworkMethod method, RuleWrapperProvider provider, AbstractRunner runner) throws InitializationError {
@@ -110,15 +111,25 @@ public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> impl
         protected void invokeTest(Statement base, Object target, Dependencies dependencies) throws Throwable {
             try {
                 base.evaluate();
+                String prop = System.getProperty("testMethodQname");
+                if (prop != null) {
+                    System.setProperty(prop + ".failed", "false");
+                }
             } catch (Throwable t) {
                 Test anno = method.getAnnotation(Test.class);
                 if (anno.expected() != null && anno.expected().isInstance(t)) {
                     return;
                 }
+                // Allows tests which should clean up data files to not do so in the case of
+                // failure
+                String prop = System.getProperty("testMethodQname");
+                if (prop != null) {
+                    System.setProperty(prop + ".failed", "true");
+                }
                 throw t;
             }
         }
-    }    
+    }
 
     public static Exception fakeException(String msg, Class<?> testClass, int positedLineNumber) {
         return new GuiceTestException(msg, testClass, positedLineNumber);
@@ -156,7 +167,7 @@ public abstract class AbstractRunner extends ParentRunner<TestMethodRunner> impl
     public Statement classBlock(RunNotifier notifier) {
         return super.classBlock(notifier);
     }
-    
+
     @Override
     protected Description describeChild(TestMethodRunner child) {
         return child.getDescription();
