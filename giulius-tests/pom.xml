@@ -64,9 +64,6 @@
                     <perCoreThreadCount>1</perCoreThreadCount>
                     <threadCount>1</threadCount>
                     <reuseForks>false</reuseForks>
-                    <systemPropertyVariables>
-                        <databaseSchema>MY_TEST_SCHEMA_${surefire.forkNumber}</databaseSchema>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
