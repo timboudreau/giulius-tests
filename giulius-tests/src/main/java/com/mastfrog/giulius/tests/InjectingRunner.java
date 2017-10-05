@@ -70,7 +70,7 @@ final class InjectingRunner extends BlockJUnit4ClassRunner {
         return injectionRunner.describeChild(super.describeChild(method));
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
     protected void validateInstanceMethods(List<Throwable> errors) {
         //this is already done by the GuiceRunner
     }

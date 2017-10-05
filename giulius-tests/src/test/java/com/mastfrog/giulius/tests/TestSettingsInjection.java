@@ -50,7 +50,6 @@ public class TestSettingsInjection {
     
     @BeforeClass
     public static void setUpClass() {
-        System.out.println("SetUpClass");
         String homeDirName = System.getProperty("user.home");
         File homeDir = new File (homeDirName);
         if (homeDir.exists()) {
@@ -159,7 +158,6 @@ public class TestSettingsInjection {
             this.other = other;
             this.aval = aval;
             this.bval = bval;
-            System.out.println("Created an MIT2 with " + what);
         }
 
         public String toString() {

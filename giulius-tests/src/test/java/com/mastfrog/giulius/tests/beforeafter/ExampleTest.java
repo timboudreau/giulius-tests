@@ -18,7 +18,9 @@ import java.util.Stack;
 public class ExampleTest {
     static class L {
         public void info(String s) {
-            System.out.println(s);
+            if (Boolean.getBoolean("giulius.debug")) {
+                System.out.println(s);
+            }
         }
     }
     static L log = new L();
@@ -52,7 +54,6 @@ public class ExampleTest {
         log.info("--------------- Starting test ---------------");
         b = new Object();
         s.push(b);
-        Thread.dumpStack();
 
         log.info("A = " + a);
         log.info("B = " + b);
@@ -71,8 +72,6 @@ public class ExampleTest {
 
     @After
     public void cleanUp() {
-        System.out.println("!!!!! Cleanup!");
-        Thread.dumpStack();
         System.out.flush();
         
         assertNotNull(b);
@@ -100,7 +99,6 @@ public class ExampleTest {
         log.info("========== Ending testAddFolder   ==========");
     }
 
-    /*
     @Test
     public void testAddSavedQueryFolder(User user) {
         assertNotNull(b);
@@ -191,5 +189,4 @@ public class ExampleTest {
         log.info("C = " + c);
         log.info("======== Ending testLastUpdateTime   =======");
     }
-    */
 }

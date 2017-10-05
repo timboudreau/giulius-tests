@@ -15,12 +15,10 @@ public class NetworkCheckTest {
         NetworkCheck check = new NetworkCheck("127.0.0.1", false);
         boolean result = check.isNetworkAvailable();
         assertTrue (result);
-        System.out.println("Check " + check + ": " + result);
         
         assertEquals (result, check.isNetworkAvailable());
         
         check = new NetworkCheck("169.254.0.15", false); //Link Local - should always fail
-        System.out.println("Check " + check + ": " + result);
 //        result = check.isNetworkAvailable();
 //        assertFalse (result);
 //        
@@ -33,8 +31,6 @@ public class NetworkCheckTest {
     @SkipWhenNetworkUnavailable
     public void testSkipWhenNetworkUnavailableAnnotation() {
         NetworkCheck check = TestMethodRunner.NETWORK_CHECK;
-        System.out.println("testSkipWhenNetworkUnavailableAnnotation running");
         assertTrue (check.isNetworkAvailable());
-        System.out.println("  result " + check);
     }
 }

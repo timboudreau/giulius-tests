@@ -61,9 +61,7 @@ public class TestWrapRunners {
 
         @Override
         protected void invokeTest(Statement base, Object target, FrameworkMethod method, Dependencies dependencies) throws Throwable {
-            System.out.println("Invoke test " + method);
             MyAnno anno = method.getAnnotation(MyAnno.class);
-            System.out.println("anno is " + anno);
             assert anno != null;
             System.setProperty(anno.name(), anno.value());
             base.evaluate();

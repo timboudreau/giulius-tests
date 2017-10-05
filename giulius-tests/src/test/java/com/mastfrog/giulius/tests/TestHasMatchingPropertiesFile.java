@@ -37,10 +37,11 @@ import org.junit.runner.RunWith;
  */
 @RunWith(GuiceRunner.class)
 public class TestHasMatchingPropertiesFile {
-    
+
+    private static boolean configureCalled;
+
     @TestWith(QM.class)
     public void test(Q q) {
-        System.out.println("abcdefgh");
         assertNotNull(q);
         assertEquals("Bub's", q.barbecue);
     }
@@ -51,12 +52,18 @@ public class TestHasMatchingPropertiesFile {
         assertNotNull(r);
         assertEquals("spoon", r.fork);
     }
+
+    static void assertConfigureCalled() {
+        boolean old = configureCalled;
+        configureCalled = false;
+        assertTrue(old);
+    }
     
     public static final class QM extends AbstractModule {
 
         @Override
         protected void configure() {
-            System.out.println("CONFIGURE-module");
+            configureCalled = true;
         }
         
     }

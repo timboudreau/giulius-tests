@@ -96,7 +96,6 @@ public class NetworkCheck {
                 }
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
             result = false;
         }
         return result;
