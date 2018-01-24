@@ -24,6 +24,7 @@ public class TestIteratingClassAndMethod {
 
     @TestWith(iterate={ModuleE.class, ModuleF.class})
     public void alsoIterates() {
+        assertTrue(GuiceRunner.currentMethodName().endsWith("__alsoIterates"));
         if (true) {
             // FIXME - broken by JUnit upgrade - something order dependent here
             return;

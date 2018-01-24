@@ -29,6 +29,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
+import com.mastfrog.util.thread.ProtectedThreadLocal;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -368,6 +369,25 @@ public class GuiceRunner extends AbstractRunner {
         return con;
     }
 
+    static ProtectedThreadLocal<String> CURRENT_TEST = new ProtectedThreadLocal<String>();
+
+    /**
+     * For logging purposes, get the name and modules of the currently running
+     * test. In iterative tests, it can be ambiguous which test is currently
+     * being run if doing parallel tests, so logging can be tough to map back to
+     * a particular set of modules.
+     *
+     * @return The name of a test or a string indicating none is running
+     */
+    public static String currentMethodName() {
+        String fm = CURRENT_TEST.get();
+        if (fm != null) {
+            return fm;
+        } else {
+            return "<no current test>";
+        }
+    }
+
     static class GuiceTestRunner extends TestMethodRunner {
 
         public GuiceTestRunner(TestClass testClass, FrameworkMethod method, RuleWrapperProvider prov, AbstractRunner runner) throws InitializationError {
@@ -383,6 +403,7 @@ public class GuiceRunner extends AbstractRunner {
             final boolean shouldThrowException = (test != null && !"None".equals(test.expected().getSimpleName())) || 
                     (testWith != null && !"None".equals(testWith.expected().getSimpleName()));
             try {
+                CURRENT_TEST.set(this + "__" + method.getName());
                 if (paramTypes.length == 0) {
                     base.evaluate();
                     if (shouldThrowException) {
@@ -451,6 +472,8 @@ public class GuiceRunner extends AbstractRunner {
                     return;
                 }
                 throw t;
+            } finally {
+                CURRENT_TEST.set(null);
             }
         }
     }
