@@ -33,6 +33,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -43,9 +44,24 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <fork>false</fork>
                     <debug>true</debug>
                     <source>1.6</source>
                     <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <annotationProcessorPaths>
+                        <annotationProcessorPath>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>annotation-processors</artifactId>
+                            <version>${mastfrog.version}</version>
+                        </annotationProcessorPath>
+                        <annotationProcessorPath>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>giulius-annotation-processors</artifactId>
+                            <version>${mastfrog.version}</version>
+                        </annotationProcessorPath>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -72,6 +88,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>giulius</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>giulius-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

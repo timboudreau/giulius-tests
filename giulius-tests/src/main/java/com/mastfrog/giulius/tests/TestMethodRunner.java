@@ -29,8 +29,8 @@ import com.mastfrog.settings.SettingsBuilder;
 import com.mastfrog.settings.Settings;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
-import com.mastfrog.giulius.annotations.Namespace;
 import com.mastfrog.settings.MutableSettings;
+import static com.mastfrog.settings.SettingsBuilder.DEFAULT_NAMESPACE;
 import com.mastfrog.util.Streams;
 import com.mastfrog.util.Strings;
 import java.io.File;
@@ -311,7 +311,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         }
         DependenciesBuilder builder = Dependencies.builder().useMutableSettings();
         builder.addDefaultSettings();
-        if (!Collections.singleton(Namespace.DEFAULT).equals(builder.namespaces())) {
+        if (!Collections.singleton(DEFAULT_NAMESPACE).equals(builder.namespaces())) {
             log("\nNAMESPACES: " + builder.namespaces());
         }
         for (String ns : builder.namespaces()) {
