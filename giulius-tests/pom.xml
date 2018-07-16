@@ -61,6 +61,11 @@
                             <artifactId>giulius-annotation-processors</artifactId>
                             <version>${mastfrog.version}</version>
                         </annotationProcessorPath>
+                        <annotationProcessorPath>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>util-fileformat</artifactId>
+                            <version>${mastfrog.version}</version>
+                        </annotationProcessorPath>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
@@ -96,7 +101,6 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
