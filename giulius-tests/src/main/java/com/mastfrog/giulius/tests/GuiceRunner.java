@@ -29,7 +29,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
-import com.mastfrog.util.thread.ProtectedThreadLocal;
+import com.mastfrog.util.thread.AutoCloseThreadLocal;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -369,7 +369,7 @@ public class GuiceRunner extends AbstractRunner {
         return con;
     }
 
-    static ProtectedThreadLocal<String> CURRENT_TEST = new ProtectedThreadLocal<String>();
+    static AutoCloseThreadLocal<String> CURRENT_TEST = new AutoCloseThreadLocal<String>();
 
     /**
      * For logging purposes, get the name and modules of the currently running

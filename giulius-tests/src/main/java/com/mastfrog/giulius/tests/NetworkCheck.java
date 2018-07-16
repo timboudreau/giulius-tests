@@ -23,7 +23,7 @@
  */
 package com.mastfrog.giulius.tests;
 
-import com.mastfrog.util.Streams;
+import com.mastfrog.util.streams.Streams;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
