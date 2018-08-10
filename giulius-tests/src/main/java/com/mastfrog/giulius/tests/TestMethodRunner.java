@@ -97,7 +97,36 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         }
     }
 
-    protected boolean skip() {
+    static boolean shouldSkip(SkipWhen condition) {
+        boolean result;
+        if (condition == null) {
+            result = false;
+        } else {
+            String checkFor = condition.value();
+            boolean invert = condition.invert();
+            String val = System.getProperty(checkFor, System.getenv(checkFor));
+            if (val == null) {
+                val = System.getenv(checkFor.toUpperCase().replace('.', '_'));
+            }
+            if (val != null) {
+                switch (val.toLowerCase().trim()) {
+                    case "true":
+                    case "1":
+                    case "yes":
+                        result = !invert;
+                        break;
+                    default :
+                        result = invert;
+                }
+            } else {
+                result = invert;
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("deprecation")
+    static boolean shouldSkip(TestClass testClass, FrameworkMethod method) {
         boolean inIDE = Dependencies.isIDEMode();
         boolean result = inIDE && (testClass.getJavaClass().getAnnotation(SkipWhenRunInIDE.class) != null
                 || method.getAnnotation(SkipWhenRunInIDE.class) != null);
@@ -111,7 +140,18 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                 }
             }
         }
+        if (!result) {
+            SkipWhen condition = testClass.getJavaClass().getAnnotation(SkipWhen.class);
+            if (condition == null) {
+                condition = method.getAnnotation(SkipWhen.class);
+            }
+            result = shouldSkip(condition);
+        }
         return result;
+    }
+
+    protected boolean skip() {
+        return shouldSkip(testClass, method);
     }
 
     /**
@@ -153,9 +193,8 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
      * Override to add any locations for settings files to the <i>beginning</i>
      * of the list of places to load settings from.
      * <p/>
-     * Note: The default implementation looks for
-     * <code>tests.properties</code> (this file name can be overridden by
-     * setting the system property
+     * Note: The default implementation looks for <code>tests.properties</code>
+     * (this file name can be overridden by setting the system property
      * <code>guice.test.properties.file</code>). If overriding, call
      * <code>super.onBeforeComputeSettingsLocations()</code> if you want to
      * maintain this behavior.
@@ -192,8 +231,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
      * list of places to load settings from.
      * <p/>
      * The default behavior is to look for a directory under user.home with the
-     * name
-     * <code>tests</code> (or whatever value the system property
+     * name <code>tests</code> (or whatever value the system property
      * <code>guice.test.settings.overrides.dir</code> is), and, if it exists,
      * iterate all the already established settings locations (simple
      * com/foo/whatever.properties paths) and, if a file with the same relative

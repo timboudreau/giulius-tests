@@ -567,22 +567,28 @@ public class GuiceRunner extends AbstractRunner {
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         protected boolean skip() {
             boolean result = super.skip();
-            if (!result && Dependencies.isIDEMode()) {
+            System.out.println("test method " + method.getName());
+            if (!result) {
                 TestWith classAnnotation = testClass.getJavaClass().getAnnotation(TestWith.class);
                 if (classAnnotation != null && indexInClassAnnotation != -1) {
                     Class<? extends Module> iteration = classAnnotation.iterate()[indexInClassAnnotation];
                     if (iteration.getAnnotation(SkipWhenRunInIDE.class) != null) {
-                        result = true;
+                        result |= Dependencies.isIDEMode();
                     }
+                    SkipWhen condition = iteration.getAnnotation(SkipWhen.class);
+                    result |= TestMethodRunner.shouldSkip(condition);
                 }
                 TestWith methodAnnotation = method.getAnnotation(TestWith.class);
                 if (methodAnnotation != null && indexInMethodAnnotation != -1) {
                     Class<? extends Module> iteration = methodAnnotation.iterate()[indexInMethodAnnotation];
                     if (iteration.getAnnotation(SkipWhenRunInIDE.class) != null) {
-                        result |= true;
+                        result |= Dependencies.isIDEMode();
                     }
+                    SkipWhen condition = iteration.getAnnotation(SkipWhen.class);
+                    result |= TestMethodRunner.shouldSkip(condition);
                 }
             }
             return result;

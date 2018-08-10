@@ -1,7 +1,7 @@
-/* 
+/*
  * The MIT License
  *
- * Copyright 2013 Tim Boudreau.
+ * Copyright 2018 Tim Boudreau.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,34 @@
  */
 package com.mastfrog.giulius.tests;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Annotation which can be applied to test methods, classes or 
- * TestWith iterate= arguments to skip running a particular test
- * (which may be long or expensive to run) when running in "IDE mode".
- * <p/>
- * "IDE mode" is determined by the value of the system property 
- * <code>in.ide</code>.  To set this up correctly, configure your IDE
- * to always pass <code>-DargLine="-Din.ide=true"</code> when running Maven.
- * <p/>
- * This annotation is only honored for tests running using GuiceRunner or
- * subclasses of GuiceTest.
+ * If applied to a test or test method, will check system properties
+ * and environment variables and skip test(s) if the value is
+ * "true", "yes" or "1".
  *
  * @author Tim Boudreau
- * @deprecated Use &#064;SkipWhen("in.ide") for the same effect in a more
- * general way
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Deprecated
-public @interface SkipWhenRunInIDE {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface SkipWhen {
+    /**
+     * A system property or enviornment variable which, if it evaluates to
+     * 1, yes or true, will cause a test or test method to be skipped.
+     *
+     * @return A string
+     */
+    String value();
 
+    /**
+     * Invert the test, resulting in a test or test method which runs when
+     * the system property or variable is <i>not</i> true.
+     *
+     * @return false by default
+     */
+    boolean invert() default false;
 }
