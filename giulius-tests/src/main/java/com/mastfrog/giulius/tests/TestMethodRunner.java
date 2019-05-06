@@ -147,6 +147,18 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
             }
             result = shouldSkip(condition);
         }
+        if (!result) {
+            IfBinaryAvailable avail = testClass.getJavaClass().getAnnotation(IfBinaryAvailable.class);
+            if (avail == null) {
+                avail = method.getAnnotation(IfBinaryAvailable.class);
+            }
+            if (avail != null) {
+                result = !BinaryChecks.test(avail);
+                if (result) {
+                    log("Binary '" + avail.value() + "' not found - skipping " + testClass.getName() + "." + method.getName());
+                }
+            }
+        }
         return result;
     }
 
