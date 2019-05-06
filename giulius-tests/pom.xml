@@ -122,7 +122,10 @@
             </snapshots>
         </repository>
     </repositories>
-    <url>https://github.com/timboudreau/giulius-tests</url>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/timboudreau/giulius-tests/issues</url>
+    </issueManagement>
     <scm>
         <url>https://github.com/timboudreau/giulius-tests</url>
         <connection>scm:git:https://github.com/timboudreau/giulius-tests.git</connection>
