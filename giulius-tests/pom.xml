@@ -4,7 +4,7 @@
     <parent>
         <artifactId>mastfrog-parent</artifactId>
         <groupId>com.mastfrog</groupId>
-        <version>2.6.1</version>
+        <version>2.6.2</version>
         <relativePath/>
     </parent>
     <name>Giulius Tests</name>
@@ -74,7 +74,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20.1</version>
                 <configuration>
                     <parallel/>
                     <!-- TestIteration checks the order, and requires that both
