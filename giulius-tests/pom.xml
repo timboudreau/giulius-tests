@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <parent>
         <artifactId>mastfrog-parent</artifactId>
         <groupId>com.mastfrog</groupId>
-        <version>2.8.1</version>
+        <version>3.0.0-dev</version>
         <relativePath/>
     </parent>
     <name>Giulius Tests</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>giulius-tests</artifactId>
     <url>https://github.com/timboudreau/giulius-tests</url>
+
     <build>
         <testResources>
             <testResource>
@@ -75,11 +80,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <parallel/>
-                    <!-- TestIteration checks the order, and requires that both
-                    tests run on the same instance, so it will randomly fail
-                    if we run parallel tests - it is testing the behavior of
-                    the running in that situation, and we cannot test that
-                    otherwise
+<!-- TestIteration checks the order, and requires that both
+                         tests run on the same instance, so it will randomly fail
+                         if we run parallel tests - it is testing the behavior of
+                         the running in that situation, and we cannot test that
+                         otherwise
                     -->
                     <parallelMavenExecution>false</parallelMavenExecution>
                     <perCoreThreadCount>1</perCoreThreadCount>
@@ -111,15 +116,18 @@
         <system>Github</system>
         <url>https://github.com/timboudreau/giulius-tests/issues</url>
     </issueManagement>
+
     <scm>
         <url>https://github.com/timboudreau/giulius-tests.git</url>
         <connection>scm:git:https://github.com/timboudreau/giulius-tests.git</connection>
         <developerConnection>git@github.com/timboudreau/giulius-tests.git</developerConnection>
     </scm>
+
     <organization>
         <name>Mastfrog Technologies</name>
         <url>https://mastfrog.com</url>
     </organization>
+
     <licenses>
         <license>
             <name>MIT</name>
@@ -127,6 +135,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <name>Tim Boudreau</name>
