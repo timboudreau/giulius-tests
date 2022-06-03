@@ -101,12 +101,6 @@
             <artifactId>giulius-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>injection-reflection-indexer</artifactId>
-            <version>${mastfrog.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
