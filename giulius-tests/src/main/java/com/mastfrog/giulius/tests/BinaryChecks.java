@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +43,8 @@ final class BinaryChecks {
         "/bin",
         "/usr/bin",
         "/usr/local/bin",
-        "/opt/local/bin",};
+        "/opt/local/bin",
+        "/opt/homebrew/bin",};
 
     private BinaryChecks() {
         throw new AssertionError();
@@ -71,9 +73,13 @@ final class BinaryChecks {
         for (String pth : stringPaths()) {
             Path p = Paths.get(pth);
             if (Files.exists(p) && Files.isDirectory(p)) {
-                result.add(p.resolve(pth));
+                if (Files.exists(p.resolve(binaryName))) {
+                    result.add(p.resolve(binaryName));
+                }
                 for (String alt : alternates) {
-                    result.add(p.resolve(alt));
+                    if (Files.exists(p.resolve(alt))) {
+                        result.add(p.resolve(alt));
+                    }
                 }
             }
         }
@@ -82,14 +88,21 @@ final class BinaryChecks {
 
     static boolean isExecutable(String binaryName, String[] alternates) {
         for (Path pth : paths(binaryName, alternates)) {
-            if (Files.exists(pth) && !Files.isDirectory(pth) && pth.toFile().canExecute()) {
+            if (Files.exists(pth) && !Files.isDirectory(pth) && Files.isExecutable(pth)) {
                 return true;
+            } else {
+                System.out.println("Nope: " + pth);
             }
         }
         return false;
     }
 
     static boolean test(IfBinaryAvailable test) {
-        return isExecutable(test.value(), test.alternateNames());
+        boolean result = isExecutable(test.value(), test.alternateNames());
+        if (!result) {
+            System.err.println("Binary " + test.value() + " not available.  Test will be skipped.");
+            System.err.println("Checked " + paths(test.value(), test.alternateNames()));
+        }
+        return result;
     }
 }
