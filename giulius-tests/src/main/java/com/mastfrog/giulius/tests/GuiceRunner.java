@@ -27,9 +27,9 @@ import com.mastfrog.settings.Settings;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.mastfrog.function.threadlocal.ThreadLocalValue;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
-import com.mastfrog.util.thread.AutoCloseThreadLocal;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -188,6 +188,8 @@ import org.junit.runners.model.TestClass;
  * @author Tim Boudreau
  */
 public class GuiceRunner extends AbstractRunner {
+
+    static ThreadLocalValue<String> CURRENT_TEST = ThreadLocalValue.create();
 
     public GuiceRunner(Class<?> testClass) throws InitializationError {
         this(testClass, new DefaultRunnerFactory());
@@ -369,7 +371,6 @@ public class GuiceRunner extends AbstractRunner {
         return con;
     }
 
-    static AutoCloseThreadLocal<String> CURRENT_TEST = new AutoCloseThreadLocal<String>();
 
     /**
      * For logging purposes, get the name and modules of the currently running
