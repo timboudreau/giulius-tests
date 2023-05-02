@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.test.annotation.support;
 
+import com.mastfrog.giulius.tests.anno.IfBinaryAvailable;
 import com.mastfrog.util.collections.ArrayUtils;
 import com.mastfrog.util.strings.Strings;
 import java.io.File;
@@ -30,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -86,18 +86,16 @@ final class BinaryChecks {
         return result;
     }
 
-    static boolean isExecutable(String binaryName, String[] alternates) {
+    public static boolean isExecutable(String binaryName, String[] alternates) {
         for (Path pth : paths(binaryName, alternates)) {
             if (Files.exists(pth) && !Files.isDirectory(pth) && Files.isExecutable(pth)) {
                 return true;
-            } else {
-                System.out.println("Nope: " + pth);
             }
         }
         return false;
     }
 
-    static boolean test(IfBinaryAvailable test) {
+    public static boolean test(IfBinaryAvailable test) {
         boolean result = isExecutable(test.value(), test.alternateNames());
         if (!result) {
             System.err.println("Binary " + test.value() + " not available.  Test will be skipped.");

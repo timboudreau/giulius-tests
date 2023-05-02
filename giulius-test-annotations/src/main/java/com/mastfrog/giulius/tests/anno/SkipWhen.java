@@ -1,7 +1,7 @@
-/* 
+/*
  * The MIT License
  *
- * Copyright 2013 Tim Boudreau.
+ * Copyright 2018 Tim Boudreau.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.tests.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,13 +29,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotate a module with this to provide a shorthand name for it in
- * unit test reports.
+ * If applied to a test or test method, will check system properties
+ * and environment variables and skip test(s) if the value is
+ * "true", "yes" or "1".
  *
  * @author Tim Boudreau
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface ModuleName {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface SkipWhen {
+    /**
+     * A system property or enviornment variable which, if it evaluates to
+     * 1, yes or true, will cause a test or test method to be skipped.
+     *
+     * @return A string
+     */
     String value();
+
+    /**
+     * Invert the test, resulting in a test or test method which runs when
+     * the system property or variable is <i>not</i> true.
+     *
+     * @return false by default
+     */
+    boolean invert() default false;
+
 }

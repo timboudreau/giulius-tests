@@ -25,6 +25,7 @@ package com.mastfrog.giulius.tests;
 
 import com.google.inject.Injector;
 import com.mastfrog.giulius.Dependencies;
+import com.mastfrog.giulius.tests.anno.OnInjection;
 import org.junit.runner.RunWith;
 
 /**

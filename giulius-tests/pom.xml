@@ -109,8 +109,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>${mastfrog.groupId}</groupId>
             <artifactId>giulius</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${mastfrog.groupId}</groupId>
+            <artifactId>giulius-test-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${mastfrog.groupId}</groupId>
+            <artifactId>giulius-test-annotation-support</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

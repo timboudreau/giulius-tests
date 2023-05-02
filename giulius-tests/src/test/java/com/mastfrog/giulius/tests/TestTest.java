@@ -1,6 +1,7 @@
 package com.mastfrog.giulius.tests;
 
 import com.google.inject.Inject;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;

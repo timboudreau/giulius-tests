@@ -1,4 +1,5 @@
 package com.mastfrog.giulius.tests;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 /**

@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.tests.anno;
 
-import com.google.inject.Module;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,7 +38,11 @@ import java.lang.annotation.Target;
  * on test methods;  or it can be used directly on test methods.  To specify
  * modules both in the test class and test method, annotate both (with different modules).
  * <p/>
- * See <code>{@link GuiceRunner}</code> for usage details.
+ * <p>
+ * Note that while the methods do not enforce <code>Class&lt;Module&gt;</code>, so annotation
+ * packages do not cart around a direct dependeny on Guice, all consumers of this annotation
+ * <i>will</code> enforce that <code>Module.class.isAssignableFrom(eachElement)</code>.
+ * </p>
  *
  * @author Tim Boudreau
  */
@@ -51,9 +54,9 @@ public @interface TestWith {
      * A list of 0 or more Guice module classes which should be instantiated
      * and used to construct object for this test.
      * @return An array of Guice
-     * <code>{@link com.google.inject.Module}</code> classes
+     * <code>Module</code> classes
      */
-    Class<? extends Module>[] value() default {};
+    Class<?>[] value() default {};
 
     /**
      * A list of 0 or more Guice
@@ -63,9 +66,9 @@ public @interface TestWith {
      * <p/>
      * This is used to have one test class or method test multiple implementations
      * of objects provided by different modules.
-     * @return An array of 0 or more modules to iterate.
+     * @return An array of 0 or more Class&lt;Module&gt; to iterate.
      */
-    Class<? extends Module>[] iterate() default {};
+    Class<?>[] iterate() default {};
     String[] iterateSettings() default {};
 
     @SuppressWarnings("MissingStaticMethodInNonInstantiatableClass")

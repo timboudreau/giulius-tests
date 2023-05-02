@@ -25,16 +25,23 @@ package com.mastfrog.giulius.tests;
 
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.mastfrog.giulius.test.annotation.support.SettingsSupport;
+import com.mastfrog.giulius.tests.anno.*;
 import com.mastfrog.settings.SettingsBuilder;
 import com.mastfrog.settings.Settings;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
+import com.mastfrog.giulius.test.annotation.support.SkipSupport;
+import com.mastfrog.giulius.test.annotation.support.AnnotationSupplier;
+import static com.mastfrog.giulius.test.annotation.support.SettingsSupport.nameOf;
+
 import com.mastfrog.settings.MutableSettings;
 import static com.mastfrog.settings.SettingsBuilder.DEFAULT_NAMESPACE;
-import com.mastfrog.util.streams.Streams;
+
 import com.mastfrog.util.strings.Strings;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -69,7 +76,6 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
     protected final FrameworkMethod method;
     private final InjectingRunner actualRunner;
     RunWrapper wrap;
-    protected static final NetworkCheck NETWORK_CHECK = new NetworkCheck("google.com", true);
     protected final RuleWrapperProvider ruleWrapper;
     private final AbstractRunner guiceRunner;
 
@@ -115,7 +121,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                     case "yes":
                         result = !invert;
                         break;
-                    default :
+                    default:
                         result = invert;
                 }
             } else {
@@ -125,41 +131,23 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         return result;
     }
 
+    static AnnotationSupplier annotationSupplier(TestClass testClass, FrameworkMethod method) {
+        AnnotationSupplier base = AnnotationSupplier.forClass(testClass.getJavaClass());
+        AnnotationSupplier methods = new AnnotationSupplier() {
+            @Override
+            public <A extends Annotation> A find(Class<A> type) {
+                return method.getAnnotation(type);
+            }
+        };
+        return methods.or(base);
+    }
+
     @SuppressWarnings("deprecation")
     static boolean shouldSkip(TestClass testClass, FrameworkMethod method) {
-        boolean inIDE = Dependencies.isIDEMode();
+        boolean inIDE = Dependencies.isIDEMode() || Boolean.getBoolean("in.ide");
         boolean result = inIDE && (testClass.getJavaClass().getAnnotation(SkipWhenRunInIDE.class) != null
                 || method.getAnnotation(SkipWhenRunInIDE.class) != null);
-        if (!result) {
-            if (testClass.getJavaClass().getAnnotation(SkipWhenNetworkUnavailable.class) != null
-                    || method.getAnnotation(SkipWhenNetworkUnavailable.class) != null) {
-                result = !NETWORK_CHECK.isNetworkAvailable();
-                if (!result) {
-                    log("Skip " + testClass.getName() + "."
-                            + method.getName() + " due to network unavailability");
-                }
-            }
-        }
-        if (!result) {
-            SkipWhen condition = testClass.getJavaClass().getAnnotation(SkipWhen.class);
-            if (condition == null) {
-                condition = method.getAnnotation(SkipWhen.class);
-            }
-            result = shouldSkip(condition);
-        }
-        if (!result) {
-            IfBinaryAvailable avail = testClass.getJavaClass().getAnnotation(IfBinaryAvailable.class);
-            if (avail == null) {
-                avail = method.getAnnotation(IfBinaryAvailable.class);
-            }
-            if (avail != null) {
-                result = !BinaryChecks.test(avail);
-                if (result) {
-                    log("Binary '" + avail.value() + "' not found - skipping " + testClass.getName() + "." + method.getName());
-                }
-            }
-        }
-        return result;
+        return result || SkipSupport.shouldSkip(annotationSupplier(testClass, method));
     }
 
     protected boolean skip() {
@@ -172,9 +160,15 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
      * @param annotation
      * @param classes
      */
+    @SuppressWarnings("unchecked")
     protected void collectModuleClasses(TestWith annotation, List<Class<? extends Module>> classes) {
         if (annotation != null) {
-            classes.addAll(Arrays.asList(annotation.value()));
+            for (Class<?> type : annotation.value()) {
+                if (!Module.class.isAssignableFrom(type)) {
+                    throw new AssertionError(type + " is not a guice module");
+                }
+                classes.add((Class<? extends Module>) type);
+            }
         }
     }
 
@@ -284,30 +278,11 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
 
     private String[] settingsLocations() {
         List<String> locations = new LinkedList<String>();
-        //First look for one next to the test:
-        Class<?> tc = testClass.getJavaClass();
-        //just in case
-        Class<?> outer = tc;
-        while (outer.getEnclosingClass() != null) {
-            outer = outer.getEnclosingClass();
-        }
-        String siblingPropertiesName = outer.getSimpleName() + ".properties";
-        if (outer.getResource(siblingPropertiesName) != null) {
-            String qname = outer.getName().replace('.', '/') + ".properties";
-            locations.add(qname);
-        }
         onBeforeComputeSettingsLocations(locations);
-        //Now look for any in annotations, class first, then method
-        Configurations locs = testClass.getJavaClass().getAnnotation(Configurations.class);
-        if (locs != null) {
-            locations.addAll(Arrays.asList(locs.value()));
-        }
-        locs = method.getAnnotation(Configurations.class);
-        if (locs != null) {
-            locations.addAll(Arrays.asList(locs.value()));
-        }
+        locations.addAll(SettingsSupport.settingsLocations(testClass.getJavaClass(),
+                annotationSupplier(testClass, method)));
         onAfterComputeSettingsLocations(locations);
-        return locations.toArray(new String[0]);
+        return locations.toArray(String[]::new);
     }
 
     private Module[] createModules(Settings settings) throws Throwable {
@@ -323,14 +298,8 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         String[] settingsLocations = settingsLocations();
         log("Loading Settings from the following locations for " + getDescription() + " " + method.getName());
         log(Strings.toString(settingsLocations));
-        for (String loc : settingsLocations) {
-            if (Streams.locate(loc) == null) {
-                throw GuiceRunner.fakeException("No such settings file: " + loc, testClass.getJavaClass(), 0);
-            }
-            sb.add(loc);
-        }
 
-        Settings settings = sb.build();
+        Settings settings = SettingsSupport.loadSettings(testClass.getJavaClass(), annotationSupplier(testClass, method), Arrays.asList(settingsLocations));
 
         if (Boolean.getBoolean("guice.tests.debug")) {
             log("SETTINGS ARE " + settings);
@@ -352,7 +321,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
                     sb.append(',');
                 }
                 Class<? extends Module> type = m.getClass();
-                sb.append(GuiceRunner.IterativeGuiceTestRunner.nameOf(type));
+                sb.append(nameOf(type));
             }
             log("Instantiated the following modules for :" + testClass.getName() + "." + method.getName());
             log(sb);
@@ -361,7 +330,7 @@ public abstract class TestMethodRunner extends Runner implements MethodRule {
         }
         DependenciesBuilder builder = Dependencies.builder().useMutableSettings();
         builder.addDefaultSettings();
-        if (!Collections.singleton(DEFAULT_NAMESPACE).equals(builder.namespaces())) {
+        if (!builder.namespaces().isEmpty() && !Collections.singleton(DEFAULT_NAMESPACE).equals(builder.namespaces())) {
             log("\nNAMESPACES: " + builder.namespaces());
         }
         for (String ns : builder.namespaces()) {

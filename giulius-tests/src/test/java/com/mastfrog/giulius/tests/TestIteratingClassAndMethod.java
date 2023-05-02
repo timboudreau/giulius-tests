@@ -4,13 +4,15 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.*;
+
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.runner.RunWith;
 
 /**
  *
  * @author Tim Boudreau
  */
-@TestWith (value=ModuleC.class, iterate={ModuleA.class,ModuleB.class})
+@TestWith(value=ModuleC.class, iterate={ModuleA.class,ModuleB.class})
 @RunWith(GuiceRunner.class)
 public class TestIteratingClassAndMethod {
     static int fieldInjectionRunCount;

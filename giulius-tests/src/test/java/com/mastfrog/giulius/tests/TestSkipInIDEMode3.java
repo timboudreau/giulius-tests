@@ -1,6 +1,7 @@
 package com.mastfrog.giulius.tests;
 
 import com.google.inject.AbstractModule;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.BeforeClass;
 import static org.junit.Assert.*;
 

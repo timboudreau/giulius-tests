@@ -1,7 +1,7 @@
-/* 
+/*
  * The MIT License
  *
- * Copyright 2013 Tim Boudreau.
+ * Copyright 2023 Mastfrog Technologies.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.junit5.tests;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.mastfrog.giulius.test.annotation.support.AnnotationSupplier;
+import com.mastfrog.giulius.test.annotation.support.SkipSupport;
+import com.mastfrog.util.service.ServiceProvider;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * Annotation which will cause the runner to try to skip tests which depend
- * on remote network connectivity.
  *
  * @author Tim Boudreau
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface SkipWhenNetworkUnavailable {
+@ServiceProvider(Extension.class)
+public final class SkipChecker implements ExecutionCondition {
 
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        AnnotationSupplier supp = AnnotationSupplier.forClassAndMethod(context.getTestClass(), context.getTestMethod());
+        return SkipSupport.shouldSkip(supp) ? ConditionEvaluationResult.disabled("Annotations indicate not to run this test")
+                : ConditionEvaluationResult.enabled("Annotation checks passed");
+    }
 }

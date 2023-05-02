@@ -23,6 +23,7 @@
  */
 package com.mastfrog.giulius.tests;
 
+import com.mastfrog.giulius.tests.anno.TestWith;
 import com.mastfrog.settings.Settings;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
@@ -30,6 +31,10 @@ import com.google.inject.Module;
 import com.mastfrog.function.threadlocal.ThreadLocalValue;
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
+import static com.mastfrog.giulius.test.annotation.support.SettingsSupport.nameOf;
+
+import com.mastfrog.giulius.tests.anno.OnInjection;
+import com.mastfrog.giulius.tests.anno.SkipWhen;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -51,32 +56,33 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
 /**
- * JUnit test runner which embeds Guice/Settings/Dependencies, so that the
- * test class takes care of instantiating Guice modules.  The purpose is
- * to eliminate repetitive Guice configuration in
- * <code>setUp()</code> / <code>{@literal @}{@link org.junit.Before}</code>
- * methods.  Instead, you simply annotate test classes or methods with what
- * modules should be used, and either have method parameters on test methods
- * or injected test class members.
+ * JUnit test runner which embeds Guice/Settings/Dependencies, so that the test
+ * class takes care of instantiating Guice modules. The purpose is to eliminate
+ * repetitive Guice configuration in <code>setUp()</code> /
+ * <code>{@literal @}{@link org.junit.Before}</code> methods. Instead, you
+ * simply annotate test classes or methods with what modules should be used, and
+ * either have method parameters on test methods or injected test class members.
  * <p/>
- * The test runner takes care of initializing
- * Guice with the right modules and using Guice to create the objects the test
- * needs, so tests can concentrate on being tests.
+ * The test runner takes care of initializing Guice with the right modules and
+ * using Guice to create the objects the test needs, so tests can concentrate on
+ * being tests.
  * <p/>
- * To use, simply annotate your test class with <code>{@literal @}{@link org.junit.runner.RunWith}(GuiceRunner.class)</code>
+ * To use, simply annotate your test class with
+ * <code>{@literal @}{@link org.junit.runner.RunWith}(GuiceRunner.class)</code>
  * Then annotate either the test methods or the class itself with
- * <code>{@literal @}{@link TestWith}(ModuleA.class, ModuleB.class)</code>
- * to indicate the list of modules that should be used.
+ * <code>{@literal @}{@link TestWith}(ModuleA.class, ModuleB.class)</code> to
+ * indicate the list of modules that should be used.
  * <p/>
  * Modules in such a test must either have a no-argument constructor or one
- * which takes a Settings object.  These constructors need not be public, but
- * one or the other or both must exist.  If both a constructor which does and
- * does not take a Settings exist, the one which takes a Settings will be
- * preferred.
+ * which takes a Settings object. These constructors need not be public, but one
+ * or the other or both must exist. If both a constructor which does and does
+ * not take a Settings exist, the one which takes a Settings will be preferred.
  * <p/>
- * A convenience test base class is provided, <code>{@link GuiceTest}</code> which takes care of the
- * <code>{@literal @}{@link org.junit.runner.RunWith}(GuiceRunner.class)</code> part, and provides
- * protected methods for getting the <code>{@link Dependencies}</code> and
+ * A convenience test base class is provided, <code>{@link GuiceTest}</code>
+ * which takes care of the
+ * <code>{@literal @}{@link org.junit.runner.RunWith}(GuiceRunner.class)</code>
+ * part, and provides protected methods for getting the
+ * <code>{@link Dependencies}</code> and
  * <code>{@link com.google.inject.Injector}</code>.
  * <p/>
  * If you want to specify modules for a specific test method, simply apply the
@@ -84,9 +90,9 @@ import org.junit.runners.model.TestClass;
  * <pre>
  *  {@literal @}TestWith({ModuleA.class, ModuleC.class})
  *  public void testGenericsA(List&lt;Integer&gt; ints, List&lt;String&gt; strings) {...}
- * </pre>
- * or you can apply the annotation to the entire test class, and simply use
- * the ordinary JUnit <code>{@literal @}{@link org.junit.Test}</code> annotation, i.e.
+ * </pre> or you can apply the annotation to the entire test class, and simply
+ * use the ordinary JUnit <code>{@literal @}{@link org.junit.Test}</code>
+ * annotation, i.e.
  * <pre>
  * {@literal @}TestWith({ModuleA.class, ModuleC.class})
  * public class MyTest extends GuiceTest {
@@ -96,14 +102,15 @@ import org.junit.runners.model.TestClass;
  *   {@literal @}Test
  *   public void myTest (List&lt;String&gt; strings) { ... }
  * }
- * </pre>
- * As you can see, while you are using the standard JUnit <code>{@literal @}{@link org.junit.Test}</code>
- * annotation, unlike in standard JUnit, your test method can have method parameters -
- * if Guice can create them, they will be passed in;  if they cannot, the test
- * will fail before it runs.
+ * </pre> As you can see, while you are using the standard JUnit
+ * <code>{@literal @}{@link org.junit.Test}</code> annotation, unlike in
+ * standard JUnit, your test method can have method parameters - if Guice can
+ * create them, they will be passed in; if they cannot, the test will fail
+ * before it runs.
  * <p/>
- * Also, as shown above, you can use the standard Guice <code>{@literal @}{@link com.google.inject.Inject}</code>
- * annotation to inject class members into your test.
+ * Also, as shown above, you can use the standard Guice
+ * <code>{@literal @}{@link com.google.inject.Inject}</code> annotation to
+ * inject class members into your test.
  * <p/>
  * <h3>Combining class and method annotations</h3>
  * You can also combine method and class annotations, if some modules are common
@@ -117,24 +124,22 @@ import org.junit.runners.model.TestClass;
  *   {@literal @}TestWith({AnotherModule.class})
  *   public void myTest (List&lt;String&gt; strings) { ... }
  * }
- * </pre>
- * The list of modules belonging to the class and to the test method
- * may not overlap.
- * 
- * <h3>Specifying configuration</code>
- * The <code>{@literal @}{@link SettingsLocations}</code> can be used to
- * annotate a test class or method (or both) with a list of paths on the
- * classpath to properties files which are used to initialize the
- * <code>{@link Settings}</code> settings used to initialize modules and
- * provide <code>{@literal @}{@link com.google.inject.name.Named}</code>
- * values.
+ * </pre> The list of modules belonging to the class and to the test method may
+ * not overlap.
+ *
+ * <h3>Specifying configuration</code> The
+ * <code>{@literal @}{@link SettingsLocations}</code> can be used to annotate a
+ * test class or method (or both) with a list of paths on the classpath to
+ * properties files which are used to initialize the
+ * <code>{@link Settings}</code> settings used to initialize modules and provide
+ * <code>{@literal @}{@link com.google.inject.name.Named}</code> values.
  * <p/>
- * GuiceRunner will automatically look for a properties file with the same
- * name as the source file in the same package, and include it if present.
+ * GuiceRunner will automatically look for a properties file with the same name
+ * as the source file in the same package, and include it if present.
  *
  * <h3>Post-injection set-up</h3>
- * To run code after injection, but before a test is run, simply annotate
- * a method with <code>{@literal @}{@link OnInjection}</code>.  I.e:
+ * To run code after injection, but before a test is run, simply annotate a
+ * method with <code>{@literal @}{@link OnInjection}</code>. I.e:
  * <pre>
  * {@literal @}TestWith(DatabaseModule.class)
  * public class MyTest extends GuiceTest {
@@ -147,24 +152,22 @@ import org.junit.runners.model.TestClass;
  *   {@literal @}TestWith(AnotherModule.class)
  *   public void myTest () { ... }
  * }
- * </pre>
- * These methods can also accept parameters created by Guice. <i>Note that
- * the standard JUnit <code>{@literal @}{@link org.junit.Before}</code> or
+ * </pre> These methods can also accept parameters created by Guice. <i>Note
+ * that the standard JUnit <code>{@literal @}{@link org.junit.Before}</code> or
  * <code>setUp()</code> methods will run <u>before</u> injection happens, and
  * should <u>not</u> expect injected parameters to be non-null.</i>
  *
  * <h2>Advanced Use</h2>
- * One of the purposes of this class is to be able to have a single test class or
- * method which is run with multiple different modules (for example, to run a
+ * One of the purposes of this class is to be able to have a single test class
+ * or method which is run with multiple different modules (for example, to run a
  * test against both a development database configuration, and also a production
- * database).  So a second value is possible on the
+ * database). So a second value is possible on the
  * <code>{@literal @}{@link TestWith}</code> annotation:
  * <pre>
  * <code>{@literal @}{@link TestWith}(value=CommonModule.class, iterate={Database1.class, Database2.class})</code>
  * public void thisTestWillRunTwice(SomeFixture fixture, DataSource src) { ... }
- * </pre>
- * This way a single test or test class can be used with multiple modules which
- * provide the same thing, without needing to duplicate code.
+ * </pre> This way a single test or test class can be used with multiple modules
+ * which provide the same thing, without needing to duplicate code.
  * <p/>
  * While not commonly useful, you <i>can</i> also combine <code>iterate</code>
  * values in both method and class annotations, and the test will be run with
@@ -178,13 +181,13 @@ import org.junit.runners.model.TestClass;
  * }
  * </pre>
  * <h2>Extending GuiceRunner</h2>
- * <code>GuiceRunner</code> is designed to be extensible, so that subclasses which
- * handle additional annotations can be created, which still use Guice for injection and
- * handle the test annotations defined in this package.  This is done by
- * implementing <code>{@link TestMethodRunner}</code> and a custom
- * <code>{@link RunnerFactory}</code> which provides runners for additional
- * test methods on a test class.
- * 
+ * <code>GuiceRunner</code> is designed to be extensible, so that subclasses
+ * which handle additional annotations can be created, which still use Guice for
+ * injection and handle the test annotations defined in this package. This is
+ * done by implementing <code>{@link TestMethodRunner}</code> and a custom
+ * <code>{@link RunnerFactory}</code> which provides runners for additional test
+ * methods on a test class.
+ *
  * @author Tim Boudreau
  */
 public class GuiceRunner extends AbstractRunner {
@@ -194,7 +197,7 @@ public class GuiceRunner extends AbstractRunner {
     public GuiceRunner(Class<?> testClass) throws InitializationError {
         this(testClass, new DefaultRunnerFactory());
     }
-    
+
     protected RunnerFactory createDefaultRunnerFactory() {
         return new DefaultRunnerFactory();
     }
@@ -209,17 +212,17 @@ public class GuiceRunner extends AbstractRunner {
 
     /**
      * Create a new GuiceRunner which will create test runners from the passed
-     * factories.  For use by subclasses which want to add additional test
-     * method types.  Typically you will want to pass an instance of
-     * <code>{@link GuiceRunner#defaultRunnerFactory()} so that regular
-     * JUnit and TestWith tests work.
+     * factories. For use by subclasses which want to add additional test method
+     * types. Typically you will want to pass an instance of
+     * <code>{@link GuiceRunner#defaultRunnerFactory()} so that regular JUnit
+     * and TestWith tests work.
      *
      * @param testClass The test class, passed in by JUnit's infrastructure
      * @param runnerFactories An array of &gt;=1 runner factories.
      * @throws InitializationError An error if the test class is somehow invalid
      */
     protected GuiceRunner(Class<?> testClass, RunnerFactory... runnerFactories) throws InitializationError {
-        super (testClass, runnerFactories);
+        super(testClass, runnerFactories);
     }
 
     @Override
@@ -228,13 +231,13 @@ public class GuiceRunner extends AbstractRunner {
         Statement st = classBlock(notifier);
         try {
             //        super.run(notifier);
-                    st.evaluate();
+            st.evaluate();
         } catch (Throwable ex) {
             notifier.fireTestFailure(new Failure(getDescription(), ex));
         }
     }
-    
-     protected static void validateModuleClassesCanBeConstructed(List<Class<?>> types, List<Throwable> errors) {
+
+    protected static void validateModuleClassesCanBeConstructed(List<Class<?>> types, List<Throwable> errors) {
         for (Class<?> c : types) {
             Constructor con = findUsableModuleConstructor(c);
             if (con == null) {
@@ -244,8 +247,8 @@ public class GuiceRunner extends AbstractRunner {
                 errors.add(fakeException(sb.toString(), c, 0));
             }
         }
-    }    
-     
+    }
+
     protected static void checkOverlap(FrameworkMethod m, TestWith anno, List<Throwable> errors) {
         List<Class<?>> a = collectClasses(anno, errors);
         List<Class<?>> b = collectClasses(m.getAnnotation(TestWith.class), errors);
@@ -258,8 +261,8 @@ public class GuiceRunner extends AbstractRunner {
         if (set.size() != a.size() + b.size()) {
             a.addAll(b);
             a.removeAll(set);
-            errors.add(new IllegalArgumentException("Class and method both want to " + 
-                    "create an instance of the same module(s): " + a));
+            errors.add(new IllegalArgumentException("Class and method both want to "
+                    + "create an instance of the same module(s): " + a));
         }
     }
 
@@ -273,8 +276,9 @@ public class GuiceRunner extends AbstractRunner {
         }
         return null;
     }
-    
+
     static class DefaultRunnerFactory implements RunnerFactory {
+
         private AbstractRunner runner;
 
         @Override
@@ -310,30 +314,30 @@ public class GuiceRunner extends AbstractRunner {
                 TestWith methodAnnotation = m.getAnnotation(TestWith.class);
                 if (classAnnotation == null && methodAnnotation != null) {
                     if (methodAnnotation.iterate().length == 0) {
-                        runners.add (new GuiceTestRunner(testClass, m, p, runner));
+                        runners.add(new GuiceTestRunner(testClass, m, p, runner));
                     } else {
-                        for (int i=0; i < methodAnnotation.iterate().length; i++) {
-                            runners.add (new IterativeGuiceTestRunner(-1, i, testClass, m, p, runner));
+                        for (int i = 0; i < methodAnnotation.iterate().length; i++) {
+                            runners.add(new IterativeGuiceTestRunner(-1, i, testClass, m, p, runner));
                         }
                     }
                 } else if (classAnnotation != null && methodAnnotation == null) {
                     if (classAnnotation.iterate().length == 0) {
-                        runners.add (new GuiceTestRunner(testClass, m, p, runner));
+                        runners.add(new GuiceTestRunner(testClass, m, p, runner));
                     } else {
-                        for (int i=0; i < classAnnotation.iterate().length; i++) {
-                            runners.add (new IterativeGuiceTestRunner(i, -1, testClass, m, p, runner));
+                        for (int i = 0; i < classAnnotation.iterate().length; i++) {
+                            runners.add(new IterativeGuiceTestRunner(i, -1, testClass, m, p, runner));
                         }
                     }
                 } else if (classAnnotation != null && methodAnnotation != null) {
                     if (classAnnotation.iterate().length == 0 && methodAnnotation.iterate().length == 0) {
-                        runners.add (new GuiceTestRunner(testClass, m, p, runner));
+                        runners.add(new GuiceTestRunner(testClass, m, p, runner));
                     } else if (classAnnotation.iterate().length > 0 && methodAnnotation.iterate().length == 0) {
-                        for (int i=0; i < classAnnotation.iterate().length; i++) {
-                            runners.add (new IterativeGuiceTestRunner(i, -1, testClass, m, p, runner));
+                        for (int i = 0; i < classAnnotation.iterate().length; i++) {
+                            runners.add(new IterativeGuiceTestRunner(i, -1, testClass, m, p, runner));
                         }
                     } else if (classAnnotation.iterate().length == 0 && methodAnnotation.iterate().length > 0) {
-                        for (int i=0; i < methodAnnotation.iterate().length; i++) {
-                            runners.add (new IterativeGuiceTestRunner(-1, i, testClass, m, p, runner));
+                        for (int i = 0; i < methodAnnotation.iterate().length; i++) {
+                            runners.add(new IterativeGuiceTestRunner(-1, i, testClass, m, p, runner));
                         }
                     } else if (classAnnotation.iterate().length > 0 && methodAnnotation.iterate().length > 0) {
                         for (int i = 0; i < classAnnotation.iterate().length; i++) {
@@ -345,7 +349,7 @@ public class GuiceRunner extends AbstractRunner {
                         throw new AssertionError("Should not get here: " + classAnnotation + " : " + methodAnnotation);
                     }
                 } else {
-                    throw new AssertionError ("Processing a method for Guice "
+                    throw new AssertionError("Processing a method for Guice "
                             + "but there is not such annotation. ??");
                 }
             }
@@ -370,7 +374,6 @@ public class GuiceRunner extends AbstractRunner {
         }
         return con;
     }
-
 
     /**
      * For logging purposes, get the name and modules of the currently running
@@ -401,8 +404,8 @@ public class GuiceRunner extends AbstractRunner {
             final Type[] paramTypes = method.getMethod().getGenericParameterTypes();
             Test test = method.getAnnotation(Test.class);
             TestWith testWith = method.getAnnotation(TestWith.class);
-            final boolean shouldThrowException = (test != null && !"None".equals(test.expected().getSimpleName())) || 
-                    (testWith != null && !"None".equals(testWith.expected().getSimpleName()));
+            final boolean shouldThrowException = (test != null && !"None".equals(test.expected().getSimpleName()))
+                    || (testWith != null && !"None".equals(testWith.expected().getSimpleName()));
             try {
                 CURRENT_TEST.set(this + "__" + method.getName());
                 if (paramTypes.length == 0) {
@@ -411,7 +414,7 @@ public class GuiceRunner extends AbstractRunner {
                         throw new AssertionError(method.getMethod().getName() + " should have thrown an exception but did not");
                     }
                 } else {
-                    final Statement st = new Statement(){
+                    final Statement st = new Statement() {
                         @Override
                         public void evaluate() throws Throwable {
                             Object[] parameters = new Object[paramTypes.length];
@@ -429,7 +432,7 @@ public class GuiceRunner extends AbstractRunner {
                                     }
                                     parameters[i] = dependencies.getInstance(key);
                                 } catch (ConfigurationException e) {
-                                    throw new IllegalStateException ("Guice configuration exception creating parameter of type " + paramTypes[i] + " for " + method.getName() + " on " + target.getClass().getName(), e);
+                                    throw new IllegalStateException("Guice configuration exception creating parameter of type " + paramTypes[i] + " for " + method.getName() + " on " + target.getClass().getName(), e);
                                 }
                             }
                             method.invokeExplosively(target, parameters);
@@ -448,7 +451,7 @@ public class GuiceRunner extends AbstractRunner {
                                 m.invokeExplosively(target);
                             }
                             try {
-                            st.evaluate();
+                                st.evaluate();
                             } finally {
                                 for (FrameworkMethod m : afters) {
                                     m.invokeExplosively(target);
@@ -464,7 +467,7 @@ public class GuiceRunner extends AbstractRunner {
 //                    }
                     beforeAfter.evaluate();
                 }
-                
+
             } catch (Throwable t) {
                 if (test != null && (test.expected().isInstance(t) || t.getCause() != null && test.expected().isInstance(t.getCause()))) {
                     return;
@@ -493,7 +496,7 @@ public class GuiceRunner extends AbstractRunner {
             checkAnnotationSettingsArguments(classAnnotation);
             checkAnnotationSettingsArguments(methodAnnotation);
         }
-        
+
         private void checkAnnotationSettingsArguments(TestWith anno) {
             if (anno == null) {
                 return;
@@ -506,11 +509,6 @@ public class GuiceRunner extends AbstractRunner {
             if (iterCount > 0 && settingsCount != 0 && settingsCount != iterCount) {
                 throw new AssertionError("If both iterate= and iterateSettings= are set, they must have the same number of arguments");
             }
-        }
-
-        public static String nameOf(Class<? extends Module> moduleClass) {
-            ModuleName mn = moduleClass.getAnnotation(ModuleName.class);
-            return mn == null ? moduleClass.getSimpleName() : mn.value();
         }
 
         private List<String> parseSettingsValue(String value) {
@@ -539,19 +537,28 @@ public class GuiceRunner extends AbstractRunner {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public String toString() {
             StringBuilder result = new StringBuilder();
             if (indexInClassAnnotation >= 0) {
                 TestWith classAnnotation = testClass.getJavaClass().getAnnotation(TestWith.class);
                 if (classAnnotation != null) {
-                    Class<? extends Module> moduleClass = classAnnotation.iterate()[indexInClassAnnotation];
+                    Class<?> type = classAnnotation.iterate()[indexInClassAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> moduleClass = (Class<? extends Module>) type;
                     result.append(nameOf(moduleClass));
                 }
             }
             if (indexInMethodAnnotation >= 0) {
                 TestWith methodAnnotation = method.getAnnotation(TestWith.class);
                 if (methodAnnotation != null) {
-                    Class<? extends Module> moduleClass = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    Class<?> type = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> moduleClass = (Class<? extends Module>) type;
                     if (result.length() > 1) {
                         result.append(",");
                     }
@@ -564,18 +571,22 @@ public class GuiceRunner extends AbstractRunner {
         @Override
         protected Description describeChild(Description origDescription) {
             return Description.createTestDescription(testClass.getJavaClass(),
-                   toString() + "__" + origDescription.getMethodName());
+                    toString() + "__" + origDescription.getMethodName());
         }
 
         @Override
-        @SuppressWarnings("deprecation")
+        @SuppressWarnings({"deprecation", "unchecked"})
         protected boolean skip() {
             boolean result = super.skip();
             System.out.println("test method " + method.getName());
             if (!result) {
                 TestWith classAnnotation = testClass.getJavaClass().getAnnotation(TestWith.class);
                 if (classAnnotation != null && indexInClassAnnotation != -1) {
-                    Class<? extends Module> iteration = classAnnotation.iterate()[indexInClassAnnotation];
+                    Class<?> type = classAnnotation.iterate()[indexInClassAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> iteration = (Class<? extends Module>) type;
                     if (iteration.getAnnotation(SkipWhenRunInIDE.class) != null) {
                         result |= Dependencies.isIDEMode();
                     }
@@ -584,7 +595,11 @@ public class GuiceRunner extends AbstractRunner {
                 }
                 TestWith methodAnnotation = method.getAnnotation(TestWith.class);
                 if (methodAnnotation != null && indexInMethodAnnotation != -1) {
-                    Class<? extends Module> iteration = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    Class<?> type = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> iteration = (Class<? extends Module>) type;
                     if (iteration.getAnnotation(SkipWhenRunInIDE.class) != null) {
                         result |= Dependencies.isIDEMode();
                     }
@@ -596,19 +611,28 @@ public class GuiceRunner extends AbstractRunner {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         protected List<Class<? extends Module>> findModuleClasses() {
             List<Class<? extends Module>> result = super.findModuleClasses();
             if (indexInClassAnnotation >= 0) {
                 TestWith classAnnotation = testClass.getJavaClass().getAnnotation(TestWith.class);
                 if (classAnnotation != null) {
-                    Class<? extends Module> iteration = classAnnotation.iterate()[indexInClassAnnotation];
+                    Class<?> type = classAnnotation.iterate()[indexInClassAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> iteration = (Class<? extends Module>) type;
                     result.add(iteration);
                 }
             }
             if (indexInMethodAnnotation >= 0) {
                 TestWith methodAnnotation = method.getAnnotation(TestWith.class);
                 if (methodAnnotation != null) {
-                    Class<? extends Module> iteration = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    Class<?> type = methodAnnotation.iterate()[indexInMethodAnnotation];
+                    if (!Module.class.isAssignableFrom(type)) {
+                        throw new AssertionError(type + " is not a guice module");
+                    }
+                    Class<? extends Module> iteration = (Class<? extends Module>) type;
                     result.add(iteration);
                 }
             }

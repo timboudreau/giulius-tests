@@ -9,3 +9,5 @@
 .idea/
 target/
 
+/giulius-test-annotation-support/nbproject/
+/giulius-junit5-tests/nbproject/

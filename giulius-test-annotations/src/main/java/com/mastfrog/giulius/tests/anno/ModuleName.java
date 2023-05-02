@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2019 Mastfrog.
+ * Copyright 2013 Tim Boudreau.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.tests.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,16 +29,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotate a module with this to provide a shorthand name for it in unit test
+ * reports.
  *
  * @author Tim Boudreau
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface IfBinaryAvailable {
-
-    public static final String REPLACE_PATHS_SYSTEM_PROP = "test.binarypaths";
-    public static final String ADDITIONAL_PATHS_SYSTEM_PROP = "test-additionalbinarypaths";
+@Target(ElementType.TYPE)
+public @interface ModuleName {
 
     String value();
-    String[] alternateNames() default {};
 }

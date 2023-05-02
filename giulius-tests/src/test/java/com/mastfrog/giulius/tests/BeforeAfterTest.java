@@ -2,6 +2,7 @@ package com.mastfrog.giulius.tests;
 
 import com.google.inject.AbstractModule;
 import com.mastfrog.giulius.tests.BeforeAfterTest.MMMM;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;

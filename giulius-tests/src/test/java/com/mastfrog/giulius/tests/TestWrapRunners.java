@@ -4,6 +4,7 @@ import com.mastfrog.giulius.tests.TestWrapRunners.ThingModule;
 import com.google.inject.AbstractModule;
 import com.mastfrog.giulius.tests.TestWrapRunners.GR;
 import com.mastfrog.giulius.Dependencies;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.FrameworkMethod;

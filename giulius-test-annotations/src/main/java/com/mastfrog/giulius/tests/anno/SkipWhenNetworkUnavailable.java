@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.tests.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,14 +29,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates a method which should be called once for each test method, after
- * any <code>{@literal @}{@link org.junit.Before}</code> or <code>setUp()</code>
- * methods, but before the actual test method is called.
- * 
+ * Annotation which will cause the runner to try to skip tests which depend
+ * on remote network connectivity.
+ *
  * @author Tim Boudreau
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface OnInjection {
-
-}
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface SkipWhenNetworkUnavailable {}

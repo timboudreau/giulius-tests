@@ -8,8 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.mastfrog.giulius.tests.GuiceRunner;
-import com.mastfrog.giulius.tests.OnInjection;
-import com.mastfrog.giulius.tests.TestWith;
+import com.mastfrog.giulius.tests.anno.TestWith;
+import com.mastfrog.giulius.tests.anno.OnInjection;
 import com.mastfrog.giulius.tests.beforeafter.ExampleTest.M;
 import java.util.Stack;
 

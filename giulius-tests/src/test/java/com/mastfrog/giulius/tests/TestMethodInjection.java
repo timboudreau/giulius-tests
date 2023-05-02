@@ -1,5 +1,6 @@
 package com.mastfrog.giulius.tests;
 import com.google.inject.Inject;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;

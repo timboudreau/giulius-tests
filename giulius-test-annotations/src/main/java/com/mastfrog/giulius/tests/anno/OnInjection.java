@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.tests.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,20 +29,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to provide locations on the classpath from which
- * settings should be loaded when constructing the injector for a test.
- *
+ * Indicates a method which should be called once for each test method, after
+ * any <code>{@literal @}{@link org.junit.Before}</code> or <code>setUp()</code>
+ * methods, but before the actual test method is called.
+ * 
  * @author Tim Boudreau
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface Configurations {
-    /**
-     * 1 or more paths which refer to existing properties files on the
-     * classpath, which should be loaded and used to supply, for example,
-     * with Guice
-     * <code>{@literal @}{@link com.google.inject.name.Named}</code> values.
-     * @return An array of strings
-     */
-    String[] value();
+@Target(ElementType.METHOD)
+public @interface OnInjection {
+
 }

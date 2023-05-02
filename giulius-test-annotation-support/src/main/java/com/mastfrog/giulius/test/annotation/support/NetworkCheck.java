@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.test.annotation.support;
 
 import com.mastfrog.util.streams.Streams;
 import java.io.File;
@@ -45,7 +45,7 @@ import javax.net.SocketFactory;
  *
  * @author Tim Boudreau
  */
-public class NetworkCheck {
+final class NetworkCheck {
 
     private final String host;
     private static final long TWO_MINUTES = 60 * 1000 * 2;//Duration TWO_MINUTES = Duration.minutes(1).add(Duration.seconds(30));

@@ -3,6 +3,7 @@ package com.mastfrog.giulius.tests;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.mastfrog.giulius.tests.anno.Configurations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;

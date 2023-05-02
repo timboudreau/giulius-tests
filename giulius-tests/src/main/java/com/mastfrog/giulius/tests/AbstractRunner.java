@@ -25,6 +25,7 @@ package com.mastfrog.giulius.tests;
 
 import com.mastfrog.giulius.Dependencies;
 import com.mastfrog.giulius.DependenciesBuilder;
+import com.mastfrog.giulius.test.annotation.support.GuiceTestException;
 import com.mastfrog.settings.Settings;
 import java.util.ArrayList;
 import java.util.LinkedList;

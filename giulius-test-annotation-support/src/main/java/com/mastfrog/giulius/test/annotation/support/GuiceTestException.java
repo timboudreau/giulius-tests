@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.mastfrog.giulius.tests;
+package com.mastfrog.giulius.test.annotation.support;
 
 /**
  *
  * @author Tim Boudreau
  */
-final class GuiceTestException extends Exception {
-    GuiceTestException(String message, Class<?> in, int positedLineNumber) {
+public final class GuiceTestException extends Exception {
+    public GuiceTestException(String message, Class<?> in, int positedLineNumber) {
         super(message);
         Class<?> outer = in;
         while (outer.getEnclosingClass() != null) {
@@ -38,4 +38,5 @@ final class GuiceTestException extends Exception {
                 outer.getSimpleName() + ".java", positedLineNumber);
         setStackTrace (new StackTraceElement[] { single });
     }
+
 }

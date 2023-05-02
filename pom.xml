@@ -22,6 +22,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>giulius-tests</module>
+        <module>giulius-test-annotations</module>
+        <module>giulius-test-annotation-support</module>
+        <module>giulius-junit5-tests</module>
     </modules>
     <issueManagement>
         <system>Github</system>

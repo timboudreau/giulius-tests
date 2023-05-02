@@ -3,6 +3,8 @@ package com.mastfrog.giulius.tests;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.mastfrog.giulius.tests.anno.Configurations;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

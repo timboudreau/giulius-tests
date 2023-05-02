@@ -26,6 +26,8 @@ package com.mastfrog.giulius.tests;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import com.mastfrog.giulius.tests.anno.SkipWhen;
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

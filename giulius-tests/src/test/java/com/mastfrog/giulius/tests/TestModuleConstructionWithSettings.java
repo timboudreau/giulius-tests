@@ -2,7 +2,10 @@ package com.mastfrog.giulius.tests;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.mastfrog.giulius.tests.anno.Configurations;
 import static org.junit.Assert.*;
+
+import com.mastfrog.giulius.tests.anno.TestWith;
 import org.junit.Test;
 
 /**
