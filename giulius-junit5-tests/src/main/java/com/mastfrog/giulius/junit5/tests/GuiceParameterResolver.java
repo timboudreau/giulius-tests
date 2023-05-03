@@ -41,6 +41,7 @@ import java.util.Arrays;
 import static java.util.Collections.unmodifiableList;
 import java.util.List;
 import java.util.Objects;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -54,6 +55,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
  * @author Tim Boudreau
  */
 @ServiceProvider(Extension.class)
+@Order(Integer.MIN_VALUE)
 public final class GuiceParameterResolver implements ParameterResolver {
 
     private static final List<Object> BASE_OBJS = Arrays.asList("giulius", "tests");

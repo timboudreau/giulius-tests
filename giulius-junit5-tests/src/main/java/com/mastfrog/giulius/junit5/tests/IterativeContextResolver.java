@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
  * @author Tim Boudreau
  */
 @ServiceProvider(Extension.class)
+@Order(Integer.MIN_VALUE)
 public final class IterativeContextResolver implements TestTemplateInvocationContextProvider {
 
     private static Set<TestWith> testWiths(ExtensionContext ec) {

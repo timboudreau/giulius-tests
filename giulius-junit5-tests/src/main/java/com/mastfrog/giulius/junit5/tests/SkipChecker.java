@@ -26,6 +26,7 @@ package com.mastfrog.giulius.junit5.tests;
 import com.mastfrog.giulius.test.annotation.support.AnnotationSupplier;
 import com.mastfrog.giulius.test.annotation.support.SkipSupport;
 import com.mastfrog.util.service.ServiceProvider;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.Extension;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * @author Tim Boudreau
  */
 @ServiceProvider(Extension.class)
+@Order(Integer.MIN_VALUE)
 public final class SkipChecker implements ExecutionCondition {
 
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {

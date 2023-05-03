@@ -26,8 +26,6 @@ package com.mastfrog.giulius.test.annotation.support;
 import com.mastfrog.giulius.tests.anno.IfBinaryAvailable;
 import com.mastfrog.giulius.tests.anno.SkipWhen;
 import com.mastfrog.giulius.tests.anno.SkipWhenNetworkUnavailable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 
 /**
  *
